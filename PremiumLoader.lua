@@ -4,9 +4,11 @@ local Keys = {}
 
 -- // <Loader>
 
-local PremiumLoader = function(Key)
+local PremiumLoader = {}
+
+PremiumLoader.Load = function(Key)
     local KeyName = "ForestFire/PremiumKey.txt"
-    
+
     if Key then
         writefile(KeyName, Key)
     end
