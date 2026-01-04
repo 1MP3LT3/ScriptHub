@@ -1,29 +1,239 @@
 -- // <Keys>
 
-local Keys = loadstring(game:HttpGet("https://raw.githubusercontent.com/1MP3LT3/ScriptHub/refs/heads/main/PremiumKeys"))()
+local Keys =
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/1MP3LT3/ScriptHub/refs/heads/main/PremiumKeys"))()
 
 -- // <Loader>
 
 local PremiumLoader = {}
 
 PremiumLoader.Load = function(Key)
-    local KeyName = "ForestFire/PremiumKey.txt"
+	local KeyName = "ForestFire/PremiumKey.txt"
 
-    if Key then
-        writefile(KeyName, Key)
-    end
+	if Key then
+		writefile(KeyName, Key)
+	end
 
-    if not isfile(KeyName) then
-        return
-    end
+	if not isfile(KeyName) then
+		return
+	end
 
-    local Key = readfile(KeyName)
-    
-    if table.find(Keys, Key) then
-        return true
-    else
-        return false
-    end
+	local Key = readfile(KeyName)
+
+	if table.find(Keys, Key) then
+		-- Gui to Lua
+		-- Version: 3.2
+
+		-- Instances:
+
+		local Notification = Instance.new("ScreenGui")
+		local Outline = Instance.new("Frame")
+		local UICorner = Instance.new("UICorner")
+		local Inner = Instance.new("Frame")
+		local UICorner_2 = Instance.new("UICorner")
+		local ImageLabel = Instance.new("ImageLabel")
+		local Label = Instance.new("TextLabel")
+		local Timer = Instance.new("Frame")
+		local UICorner_3 = Instance.new("UICorner")
+
+		--Properties:
+
+		Notification.Name = "Notification"
+		Notification.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+		Notification.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+		Outline.Name = "Outline"
+		Outline.Parent = Notification
+		Outline.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+		Outline.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Outline.BorderSizePixel = 0
+		Outline.Position = UDim2.new(0.792824507, 0, 0.844845891, 0)
+		Outline.Size = UDim2.new(0.195568055, 0, 0.143464401, 0)
+
+		UICorner.Parent = Outline
+
+		Inner.Name = "Inner"
+		Inner.Parent = Notification
+		Inner.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+		Inner.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Inner.BorderSizePixel = 0
+		Inner.Position = UDim2.new(0.797748864, 0, 0.855472922, 0)
+		Inner.Size = UDim2.new(0.186071053, 0, 0.100956433, 0)
+		Inner.ZIndex = 2
+
+		UICorner_2.Parent = Inner
+
+		ImageLabel.Name = ""
+		ImageLabel.Parent = Notification
+		ImageLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		ImageLabel.BackgroundTransparency = 1.000
+		ImageLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		ImageLabel.BorderSizePixel = 0
+		ImageLabel.Position = UDim2.new(0.804783702, 0, 0.869287968, 0)
+		ImageLabel.Size = UDim2.new(0.0232149139, 0, 0.0722635463, 0)
+		ImageLabel.ZIndex = 3
+		ImageLabel.Image = "rbxassetid://4914902889"
+
+		Label.Name = "Label"
+		Label.Parent = Notification
+		Label.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Label.BackgroundTransparency = 1.000
+		Label.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Label.BorderSizePixel = 0
+		Label.Position = UDim2.new(0.83925432, 0, 0.869287968, 0)
+		Label.Size = UDim2.new(0.134365112, 0, 0.0722635463, 0)
+		Label.ZIndex = 3
+		Label.Font = Enum.Font.SourceSansBold
+		Label.Text = "Success Premium Was Detected"
+		Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+		Label.TextSize = 34.000
+
+		Timer.Name = "Timer"
+		Timer.Parent = Notification
+		Timer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Timer.BorderColor3 = Color3.fromRGB(0, 0, 0)
+		Timer.BorderSizePixel = 0
+		Timer.Position = UDim2.new(0.798804104, 0, 0.965993643, 0)
+		Timer.Size = UDim2.new(0.185015827, 0, 0.0127523914, 0)
+
+		UICorner_3.Parent = Timer
+
+		-- Scripts:
+
+		local function VSWHP_fake_script() -- Outline.LocalScript
+			local script = Instance.new("LocalScript", Outline)
+
+			local TweenService = game:GetService("TweenService")
+
+			script.Parent.Position =
+				UDim2.new(script.Parent.Position.X.Scale - -1, 0, script.Parent.Position.Y.Scale, 0)
+
+			TweenService:Create(script.Parent, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+				Position = UDim2.new(script.Parent.Position.X.Scale + -1, 0, script.Parent.Position.Y.Scale, 0),
+			}):Play()
+
+			task.delay(5, function()
+				TweenService
+					:Create(script.Parent, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+						Position = UDim2.new(script.Parent.Position.X.Scale - -1, 0, script.Parent.Position.Y.Scale, 0),
+					})
+					:Play()
+			end)
+		end
+		coroutine.wrap(VSWHP_fake_script)()
+		local function FTSYWCA_fake_script() -- Inner.LocalScript
+			local script = Instance.new("LocalScript", Inner)
+
+			local TweenService = game:GetService("TweenService")
+
+			script.Parent.Position =
+				UDim2.new(script.Parent.Position.X.Scale - -1, 0, script.Parent.Position.Y.Scale, 0)
+
+			TweenService:Create(script.Parent, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+				Position = UDim2.new(script.Parent.Position.X.Scale + -1, 0, script.Parent.Position.Y.Scale, 0),
+			}):Play()
+
+			task.delay(5, function()
+				TweenService
+					:Create(script.Parent, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+						Position = UDim2.new(script.Parent.Position.X.Scale - -1, 0, script.Parent.Position.Y.Scale, 0),
+					})
+					:Play()
+			end)
+		end
+		coroutine.wrap(FTSYWCA_fake_script)()
+		local function EVBAA_fake_script() -- ImageLabel.LocalScript
+			local script = Instance.new("LocalScript", ImageLabel)
+
+			local TweenService = game:GetService("TweenService")
+
+			script.Parent.Position =
+				UDim2.new(script.Parent.Position.X.Scale - -1, 0, script.Parent.Position.Y.Scale, 0)
+
+			TweenService:Create(script.Parent, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+				Position = UDim2.new(script.Parent.Position.X.Scale + -1, 0, script.Parent.Position.Y.Scale, 0),
+			}):Play()
+
+			task.delay(5, function()
+				TweenService
+					:Create(script.Parent, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+						Position = UDim2.new(script.Parent.Position.X.Scale - -1, 0, script.Parent.Position.Y.Scale, 0),
+					})
+					:Play()
+			end)
+		end
+		coroutine.wrap(EVBAA_fake_script)()
+		local function NZKHW_fake_script() -- Label.LocalScript
+			local script = Instance.new("LocalScript", Label)
+
+			local TweenService = game:GetService("TweenService")
+
+			script.Parent.Position =
+				UDim2.new(script.Parent.Position.X.Scale - -1, 0, script.Parent.Position.Y.Scale, 0)
+
+			TweenService:Create(script.Parent, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+				Position = UDim2.new(script.Parent.Position.X.Scale + -1, 0, script.Parent.Position.Y.Scale, 0),
+			}):Play()
+
+			task.delay(5, function()
+				TweenService
+					:Create(script.Parent, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+						Position = UDim2.new(script.Parent.Position.X.Scale - -1, 0, script.Parent.Position.Y.Scale, 0),
+					})
+					:Play()
+			end)
+		end
+		coroutine.wrap(NZKHW_fake_script)()
+		local function CVDPKWJ_fake_script() -- Timer.LocalScript
+			local script = Instance.new("LocalScript", Timer)
+
+			local TweenService = game:GetService("TweenService")
+
+			script.Parent.Position =
+				UDim2.new(script.Parent.Position.X.Scale - -1, 0, script.Parent.Position.Y.Scale, 0)
+
+			TweenService:Create(script.Parent, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+				Position = UDim2.new(script.Parent.Position.X.Scale + -1, 0, script.Parent.Position.Y.Scale, 0),
+			}):Play()
+
+			task.delay(1.5, function()
+				local Lol
+				Lol = game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
+					deltaTime /= 15
+
+					if script.Parent.Size.X.Scale <= 0 then
+						script.Parent.Size = UDim2.new(0, 0, 0.013, 0)
+
+						Lol:Disconnect()
+						return
+					end
+
+					script.Parent.Size = UDim2.new(script.Parent.Size.X.Scale - deltaTime, 0, 0.013, 0)
+				end)
+			end)
+
+			task.delay(5, function()
+				TweenService
+					:Create(script.Parent, TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+						Position = UDim2.new(script.Parent.Position.X.Scale - -1, 0, script.Parent.Position.Y.Scale, 0),
+					})
+					:Play()
+			end)
+		end
+		coroutine.wrap(CVDPKWJ_fake_script)()
+		local function GLSZK_fake_script() -- Notification.LocalScript
+			local script = Instance.new("LocalScript", Notification)
+
+			task.delay(6, function()
+				script.Parent:Destroy()
+			end)
+		end
+		coroutine.wrap(GLSZK_fake_script)()
+
+		return true
+	else
+		return false
+	end
 end
 
 return PremiumLoader
