@@ -10,8 +10,54 @@ local platformConnection = nil
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local chrs = {}
+local Emotes =
+	game:GetService("ReplicatedStorage"):WaitForChild("Storage"):WaitForChild("BaseAnimations"):WaitForChild("Emotes")
+local RenderredEmotes = {}
+local EmotePlaying = {}
+local lplr = game:GetService("Players").LocalPlayer
+local EmoteNames = {}
+for _, Emote in Emotes:GetChildren() do
+	table.insert(EmoteNames, Emote.Name)
+end
 
 -- // Functions
+
+local function PlayEmote(Emote)
+	RenderredEmotes[Emote]:Play()
+end
+
+local function RenderEmotes()
+	for _, Emote in Emotes:GetChildren() do
+		local Animator: Animator = lplr.Character:WaitForChild("Humanoid"):WaitForChild("Animator")
+
+		local AnimT = Animator:LoadAnimation(Emote)
+		AnimT.Priority = Enum.AnimationPriority.Action4
+
+		AnimT:GetPropertyChangedSignal("IsPlaying"):Connect(function()
+			if AnimT.IsPlaying then
+				local OldJumpHeight = lplr.Character:WaitForChild("Humanoid").JumpHeight
+
+				AnimT.Stopped:Once(function()
+					lplr.Character:WaitForChild("Humanoid").JumpHeight = OldJumpHeight
+				end)
+			end
+		end)
+
+		lplr.Character:WaitForChild("Humanoid").Jumping:Connect(function(active)
+			AnimT:Stop()
+		end)
+
+		local OldHealth = lplr.Character:WaitForChild("Humanoid").Health
+		lplr.Character:WaitForChild("Humanoid").HealthChanged:Connect(function()
+			if OldHealth > lplr.Character:WaitForChild("Humanoid").Health then
+				AnimT:Stop()
+			end
+			OldHealth = lplr.Character:WaitForChild("Humanoid").Health
+		end)
+
+		RenderredEmotes[Emote.Name] = AnimT
+	end
+end
 
 local function SetupCharacter(Player)
 	local function AddToListOfCharacters(Character)
@@ -225,16 +271,15 @@ game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
 					local Health0 = (chr:FindFirstChild("Humanoid") and chr.Humanoid.Health <= 0) and true
 					local BlockDetected = chr:FindFirstChild("Blocking")
 					local CounterDetected = chr:FindFirstChild("CounterReturner")
-					
-					if 
-						(not (
-								DuelActivated
-								or InTurtorial
-								or Health0
-								or IsInLobby
-								or (BlockDetected and _G.AutoDetectBlock)
-								or (CounterDetected and _G.AutoDetectCounters)
-							)
+
+					if
+						not (
+							DuelActivated
+							or InTurtorial
+							or Health0
+							or IsInLobby
+							or (BlockDetected and _G.AutoDetectBlock)
+							or (CounterDetected and _G.AutoDetectCounters)
 						)
 					then
 						table.insert(Insts, chr)
@@ -254,7 +299,7 @@ game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
 					table.insert(Targets, {
 						Inst = Inst,
 						CF = (_G.NOKNOCKBACKAURA and Inst.PrimaryPart.CFrame * Vector3.new(1, 1, -1))
-						or Inst.PrimaryPart.CFrame,
+							or Inst.PrimaryPart.CFrame,
 					})
 				end
 			end
@@ -317,12 +362,7 @@ game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
 
 		for _, chr in chrs do
 			safecall(function()
-				if
-					chr:GetAttribute("Spawned")
-					and not (chr.Humanoid.Health <= 0)
-					and not chr:GetAttribute("Turtorial")
-					and not chr:FindFirstChild("Invulnerable")
-				then
+				if chr:GetAttribute("Spawned") and not (chr.Humanoid.Health <= 0) then
 					table.insert(chrsLOADED, chr)
 				end
 			end)
@@ -334,7 +374,7 @@ game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
 			safecall(function()
 				table.insert(Targets, {
 					Inst = chrLOADED,
-					CF = lplr.Character.PrimaryPart.CFrame,
+					CF = CFrame.new(0, 0, 0),
 				})
 			end)
 		end
@@ -385,6 +425,11 @@ game:GetService("RunService").RenderStepped:Connect(function(deltaTime)
 	end
 end)
 
+lplr.CharacterAdded:Connect(RenderredEmotes)
+
+if lplr.Character then
+	RenderEmotes()
+end
 -- // _G Stuff
 
 _G.ReachAutoAttack = 15
@@ -461,6 +506,14 @@ Main:CreateToggle({
 	end,
 }, "AutoAttack")
 Main:CreateToggle({
+	Name = "No Aura Knockback",
+	Default = false, -- Default value (true / false)
+
+	Callback = function(Value)
+		_G.NOKNOCKBACKAURA = Value
+	end,
+}, "NOAURAKNOCKB2CK")
+Main:CreateToggle({
 	Name = "Aura Fling",
 	Default = false, -- Default value (true / false)
 
@@ -532,7 +585,30 @@ Main:CreateToggle({
 		end
 	end,
 }, "HideUnderGround")
+Main:CreateSection("Emote Player FE")
+Main:CreateDropdown({
+	Options = EmoteNames,
+	CurrentOption = { EmoteNames[1] },
+	Name = "Emotes",
 
+	Callback = function(Value)
+		_G.SelectedEmote = Value
+	end,
+}, "EmoteSelected")
+Main:CreateButton({
+	Name = "Play Emote Selected",
+	Callback = function()
+		PlayEmote(_G.SelectedEmote)
+	end,
+	DoubleClick = false,
+
+	Description = "sets the current clipboard to The Discord Invite",
+	DisabledDescription = "I am disabled!",
+
+	Disabled = false, -- Will disable the button (true / false)
+	Visible = true, -- Will make the button invisible (true / false)
+	Risky = false, -- Makes the text red (the color can be changed using Library.Scheme.Red) (Default value = false)
+})
 Credits:CreateParagraph({
 	Name = "Credits",
 	Text = '<stroke color="rgb(0,0,0)" thickness="2"><font color="rgb(255,0,0)">[enzoe15226 (Crimson)]</font></stroke> Made The Full Script \n <stroke color="rgb(0,0,0)" thickness="2"><font color="rgb(128, 0, 128)">[lunaa_cat. (Incognito)]</font></stroke> Made Hide Underground',
@@ -560,4 +636,3 @@ Credits:CreateButton({
 UISettings:BuildConfigSection() -- Tab Should be the name of the tab you are adding this section to.
 
 Luna:LoadAutoloadConfig()
-
