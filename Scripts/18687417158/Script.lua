@@ -8,7 +8,6 @@ local Characters = {}
 local Gens = {}
 local Minions = {}
 local Items = {}
-local SPRINTINGTable = {}
 local Sprays = {}
 local Camera = workspace.CurrentCamera
 local DefaultKillerESP = Color3.new(1, 0, 0)
@@ -23,17 +22,109 @@ local HighlightsFOLDER = workspace:FindFirstChild("HIGHLIGHTS") or Instance.new(
 HighlightsFOLDER.Name = "HIGHLIGHTS"
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Assets = ReplicatedStorage.Assets
-local Survivors = Assets.Survivors
-local Killers = Assets.Killers
 local emotes = Assets.Emotes
 local lchr = nil
 local lplr = game.Players.LocalPlayer
 local IngameFolder = workspace:FindFirstChild("Map"):FindFirstChild("Ingame")
-local CharactersTABLE = {}
-local CharacterConfig = nil
-local CharacterSELECTED = nil
-local AnimationTOREPLACEWITH = nil
-local AnimationToReplace = nil
+
+local ExtraEmotes = {
+	MinionBreakdown = {
+		["DisplayName"] = "Minion Breakdown",
+		["Description"] = "3 Million Orb",
+		["AssetID"] = "rbxassetid://89449841864319",
+		["SFX"] = "rbxassetid://1838457617",
+		["CUSTOMASSET"] = "https://raw.githubusercontent.com/1MP3LT3/ScriptHub/refs/heads/main/Sounds/ILLIT%20(%EC%95%84%EC%9D%BC%EB%A6%BF)%20'NOT%20CUTE%20ANYMORE%E2%80%99%20Official%20MV.mp3",
+		["SFXProperties"] = {
+			["Looped"] = false,
+		},
+		["CreatedServer"] = function(p4)
+			local v5 = p4.Character
+			if v5 then
+				local v_u_6 =
+					game:GetService("ReplicatedStorage").Assets.Skins.Killers["1x1x1x1"].Abyss1x1x1x1.Config.ZombieEmote
+						:Clone()
+				v_u_6.Name = "EmoteZombie"
+				v_u_6.PrimaryPart.Anchored = true
+				for _, v7 in v_u_6:GetDescendants() do
+					if v7:IsA("BasePart") then
+						v7.CanCollide = false
+						v7.CanQuery = false
+						v7.CanTouch = false
+					end
+				end
+				v_u_6:SetPrimaryPartCFrame(v5.PrimaryPart.CFrame)
+				v_u_6.Parent = workspace.Misc
+				v_u_6.Dummy:FindFirstChildOfClass("Animator"):LoadAnimation(v_u_6.Animation):Play()
+				task.delay(20.4, function()
+					if v_u_6 ~= nil then
+						v_u_6:Destroy()
+					end
+				end)
+			end
+		end,
+		["DestroyedServer"] = function(p4)
+			local v5 = workspace.Misc
+			if v5 then
+				if v5:FindFirstChild("EmoteZombie") then
+					v5:FindFirstChild("EmoteZombie"):Destroy()
+				end
+			end
+		end,
+	},
+	AnnhilationGuitar = {
+		["DisplayName"] = "Guitar",
+		["Description"] = "Guitar",
+		["AssetID"] = "rbxassetid://77434400165211",
+		["SFX"] = "rbxassetid://101986282901846",
+		["SFXProperties"] = {
+			["Looped"] = false,
+		},
+		["Created"] = function(p4)
+			local chr = p4.Character
+			local Guitar =
+				game:GetService("ReplicatedStorage").Assets.Skins.Killers.JohnDoe.AnnihilationJohnDoe.Rig.Guitar:Clone()
+			Guitar.Name = "Guitar"
+			Guitar.Parent = chr
+			Guitar.Transparency = 0
+		end,
+		["Destroyed"] = function(p7)
+			local v8 = p7.Character
+			local v9 = v8 and v8:FindFirstChild("Guitar")
+			if v9 then
+				v9.Transparency = 1
+			end
+		end,
+	},
+	bluudanc = {
+		["DisplayName"] = "bluudanc",
+		["Description"] = "yayyy wahooo weeeeee",
+		["AssetID"] = "rbxassetid://70756604276888",
+		["SFX"] = "rbxassetid://128124155529803",
+		["SFXProperties"] = {
+			["Looped"] = true,
+		},
+	},
+	prettydanc = {
+		["DisplayName"] = "pretty dance",
+		["Description"] = "yayyy wahooo weeeeee",
+		["AssetID"] = "rbxassetid://85315044663872",
+		["SFX"] = "rbxassetid://119720647959535",
+		["SFXProperties"] = {
+			["Looped"] = true,
+			["Volume"] = 0.7,
+		},
+	},
+	Snap = {
+		["DisplayName"] = "Snap",
+		["Description"] = " ",
+		["Speed"] = 6,
+		["AssetID"] = "rbxassetid://132946177664650",
+		["SFX"] = "rbxassetid://128566549159266",
+		["SFXProperties"] = {
+			["Looped"] = true,
+		},
+	},
+}
 
 local Emotes = {}
 
@@ -139,6 +230,7 @@ end
 
 local function EmoteUseCopy(mobile)
 	local EmoteName = nil
+
 	for _, Emote in emotes:GetChildren() do
 		local requireEmote = require(Emote)
 		if requireEmote.DisplayName == _G.Emotes then
@@ -260,28 +352,29 @@ SetupUpdateCharacter()
 local function EmoteUseNormal(mobile)
 	-- // ENGINE MADE BY CRIMSON :D
 
-	-- // Gets The Humanoid
+	-- // Variables
 
 	local Hum = lchr:FindFirstChild("Humanoid") or nil
+	local EmoteName = nil
 
 	-- // Returns If No Humanoid Is Detected
+
 	if not Hum then
 		return
 	end
 
 	-- // Gets The Emote's Names
 
-	local EmoteName = nil
 	for _, Emote in emotes:GetChildren() do
 		local requireEmote = require(Emote)
 		if requireEmote.DisplayName == _G.Emotes then
 			EmoteName = Emote.Name
-		elseif
-			requireEmote.Exclusive
-			and string.split(tostring(_G.Emotes), "[!] ")[2]
-			and requireEmote.DisplayName == string.split(tostring(_G.Emotes), "[!] ")[2]
-		then
-			EmoteName = Emote.Name
+		end
+	end
+
+	for ExtraEmoteName, ExtraEmote in ExtraEmotes do
+		if ExtraEmote.DisplayName == _G.Emotes then
+			EmoteName = ExtraEmoteName
 		end
 	end
 
@@ -307,7 +400,8 @@ local function EmoteUseNormal(mobile)
 		end
 		EmoteHACK:Destroy()
 	end
-
+	-- uhh
+	local TableForFunctions = nil
 	-- // Gets A Already Created Emote Table
 
 	local ADEmote = Emotes[EmoteName]
@@ -324,8 +418,8 @@ local function EmoteUseNormal(mobile)
 	local Audios = ADEmote.Audios
 	local AnimTracks = ADEmote.AnimTracks
 
-	local Audio = nil
-	local AnimTrack = nil
+	local Audio: Sound = nil
+	local AnimTrack: AnimationTrack = nil
 
 	-- // Makes Uhhhh Camera Go To Head instead of Humanoid Root Part
 
@@ -348,6 +442,22 @@ local function EmoteUseNormal(mobile)
 		end
 	end
 
+	-- // Runs Animations That Are Special
+
+	-- Variables
+
+	local LoopedAnimT: AnimationTrack = ADEmote.LoopAnimation
+	local LoopSound = ADEmote.LoopAudio
+	local StartAnimT: AnimationTrack = ADEmote.StartAnimation
+	local StartSound = ADEmote.LoopAudio
+
+	-- Run
+
+	if StartAnimT and LoopSound and StartSound and LoopedAnimT then
+		StartAnimT:Play()
+		StartSound:Play()
+	end
+
 	-- // Uses The GetMAX Function To Get All The Number Of Animation Tracks
 
 	local RandomNumber = math.random(1, GetMAX(AnimTracks))
@@ -364,13 +474,14 @@ local function EmoteUseNormal(mobile)
 
 	-- // Complicated To Say How This Works
 
-	RandomNumber = ((AnimTracks == Audios) and RandomNumber) or math.random(1, GetMAX(Audios))
+	RandomNumber = ((GetMAX(AnimTracks) == GetMAX(Audios)) and RandomNumber) or math.random(1, GetMAX(Audios))
 
 	-- // Simple Trick To Get One Single Audio And Play It
 
 	for Number, AudioP in pairs(Audios) do
 		if RandomNumber == tonumber(Number) then
 			Audio = AudioP
+			Audio.Name = "PlayerEmoteSFX"
 
 			Audio:Play()
 		end
@@ -378,65 +489,128 @@ local function EmoteUseNormal(mobile)
 
 	-- // Creates A Table For Start And End Function (If There Is Any)
 
-	local TableForFunctions = {
+	TableForFunctions = {
 		Character = lchr,
 		-- // FOR ACTUAL FORSAKEN
 		Emote = {
-			Animation = AnimTrack.Animation,
+			Animation = AnimTrack and AnimTrack.Animation,
+			KeyframeReached = (ADEmote.LoopAnimation and ADEmote.LoopAnimation.KeyframeReached)
+				or AnimTrack.KeyframeReached,
 			SFX = Audio,
 		},
 	}
 
 	-- // Uses The Start Function (If There Is Any)
 
-	if Emotes[EmoteName].StartFunction then
-		Emotes[EmoteName].StartFunction(TableForFunctions)
-	end
+	safecall(function()
+		if ADEmote.StartFunction then
+			Emotes[EmoteName].StartFunction(TableForFunctions)
+		end
+	end)
 
 	-- // Stop Emoting Function IMPORTANT
 
 	getgenv().StopEmoting = function()
 		Camera.CameraSubject = lchr:FindFirstChild("Humanoid")
 
-		AnimTrack:Stop()
-		Audio:Stop()
+		safecall(function()
+			AnimTrack:Stop()
+		end)
 
-		EmoteHACK:Destroy()
+		safecall(function()
+			StartAnimT:Stop()
+		end)
+
+		safecall(function()
+			StartSound:Stop()
+		end)
+
+		safecall(function()
+			LoopedAnimT:Stop()
+		end)
+
+		safecall(function()
+			LoopSound:Stop()
+		end)
+
+		safecall(function()
+			Audio:Stop()
+
+			Audio.Name = EmoteName
+		end)
+
+		safecall(function()
+			EmoteHACK:Destroy()
+		end)
 
 		for _, Connection in Connections do
 			Connection:Disconnect()
 		end
 
-		if Emotes[EmoteName].EndFunction then
-			Emotes[EmoteName].EndFunction(TableForFunctions)
-		end
+		safecall(function()
+			if ADEmote.EndFunction then
+				ADEmote.EndFunction(TableForFunctions)
+			end
+		end)
 
 		getgenv().StopEmoting = nil
 	end
 
 	-- // Connections
 
-	local JumpConnection = Hum.Jumping:Connect(function()
-		if getgenv().StopEmoting then
+	local StartAnimTConnection
+	StartAnimTConnection = StartAnimT
+		and StartAnimT.Stopped:Connect(function()
+			task.wait()
+			if getgenv().StopEmoting and StartAnimTConnection.LoopedAnimTConnection then
+				LoopedAnimT:Play()
+				AnimTrack:Play()
+
+				if ADEmote.LoopedFunction then
+					ADEmote.LoopedFunction(TableForFunctions)
+				end
+			end
+		end)
+
+	local LoopedAnimTConnection
+	LoopedAnimTConnection = LoopedAnimT
+		and LoopedAnimT.Stopped:Connect(function()
+			task.wait()
+			if getgenv().StopEmoting and LoopedAnimTConnection.LoopedAnimTConnection then
+				getgenv().StopEmoting()
+			end
+		end)
+
+	local JumpConnection
+	JumpConnection = Hum.Jumping:Connect(function()
+		task.wait()
+		if getgenv().StopEmoting and JumpConnection.Connected then
 			getgenv().StopEmoting()
 		end
 	end)
 
-	local DiedConnection = Hum.Died:Connect(function()
-		if getgenv().StopEmoting then
+	local DiedConnection
+	DiedConnection = Hum.Died:Connect(function()
+		task.wait()
+		if getgenv().StopEmoting and DiedConnection.Connected then
 			getgenv().StopEmoting()
 		end
 	end)
 
-	local StoppedEmoteConnection = AnimTrack.Stopped:Connect(function()
-		if getgenv().StopEmoting then
+	local HealthChangedConnection
+	HealthChangedConnection = Hum.HealthChanged:Connect(function()
+		task.wait()
+		if getgenv().StopEmoting and HealthChangedConnection.Connected then
 			getgenv().StopEmoting()
 		end
 	end)
 
 	-- // Adds Connections Into the table
 
-	table.insert(Connections, StoppedEmoteConnection)
+	table.insert(Connections, HealthChangedConnection)
+	table.insert(Connections, DiedConnection)
+	table.insert(Connections, LoopedAnimTConnection)
+	table.insert(Connections, StartAnimTConnection)
 	table.insert(Connections, JumpConnection)
 
 	-- // End Of Playing The Emote
@@ -450,111 +624,116 @@ function PlayEmote(mobile)
 	end
 end
 
-local function ApplyCustomAnimations(AnimationToReplace, CustomAnimationToInforce)
-	local Animator = (lchr:FindFirstChild("Humanoid")) and (lchr.Humanoid:FindFirstChild("Animator"))
-	if Animator then
-		RemoveAlreadyExistingCUSTOMANIMATIONS()
+local function LoadEmote(Emote, RequiredEmoteS: table?)
+	local RequiredEmote = RequiredEmoteS or table.clone(require(Emote))
+	local AudioProps = RequiredEmote.SFXProperties
 
-		if lchr.Parent == workspace.Players.Spectating then
-			Library:Notify("Error Use This When U Are In The Game")
-			return
+	local AnimId = RequiredEmote.AssetID
+	local AudioId = RequiredEmote.SFX
+
+	local Audios = {}
+	local AnimTracks = {}
+
+	local function AnimTP(AnimationId)
+		local Anim = Instance.new("Animation")
+		Anim.AnimationId = AnimationId
+		local AnimT = lchr:WaitForChild("Humanoid", 5):WaitForChild("Animator", 5):LoadAnimation(Anim)
+
+		return AnimT
+	end
+
+	local function CreateAudio(SoundId, IsLooped)
+		local Audio = Instance.new("Sound", lchr.PrimaryPart)
+		Audio.Looped = IsLooped
+		Audio.Name = Emote.Name
+
+		if RequiredEmote.CUSTOMASSET then
+			local response = request({
+				Url = RequiredEmote.CUSTOMASSET,
+				Method = "GET",
+			})
+
+			writefile("CustomMusic.mp3", response.Body)
+
+			Audio.SoundId = getcustomasset("CustomMusic.mp3", false)
+		else
+			Audio.SoundId = SoundId
 		end
 
-		_G.ANIMATIONCONNECTION = Animator.AnimationPlayed:Connect(function(animationTrackTrack)
-			local Animation = animationTrack.Animation
-			if Animation.AnimationId == AnimationToReplace then
-				Animation.AnimationId = CustomAnimationToInforce
-				local NewAnimationTrack = Animator:LoadAnimation(Animation)
-				NewAnimationTrack:Play()
-				if animationTrack.Looped then
-					animationTrack.Stopped:Connect(function()
-						NewAnimationTrack:Stop()
-						Animation.AnimationId = AnimationToReplace
-					end)
-				end
-			end
-		end)
-
-		Library:Notify("Successfully Applyed Custom Animations (RESETS AFTER U DIE)")
+		return Audio
 	end
+
+	if typeof(AnimId) == "string" then
+		local Number = 1
+
+		local AnimT = AnimTP(AnimId)
+		AnimTracks[tostring(Number)] = AnimT
+	elseif typeof(AnimId) == "table" then
+		for Number, Anim in ipairs(AnimId) do
+			local AnimT = AnimTP(Anim)
+			AnimTracks[tostring(Number)] = AnimT
+		end
+	end
+
+	if typeof(AudioId) == "string" then
+		local Number = 1
+		Audios[tostring(Number)] = CreateAudio(AudioId)
+	elseif typeof(AudioId) == "table" then
+		for Number, Audio in pairs(AudioId) do
+			Audios[tostring(Number)] = CreateAudio(Audio)
+		end
+	end
+
+	if AudioProps then
+		for _, Audio in pairs(Audios) do
+			for AudioPropName, AudioPropVal in AudioProps do
+				if typeof(AudioPropVal) == "number" and AudioPropVal == 0 then
+					continue
+				end
+
+				Audio[AudioPropName] = AudioPropVal
+			end
+		end
+	end
+
+	Emotes[Emote.Name] = {
+		StartFunction = RequiredEmote.Created or RequiredEmote.CreatedServer or nil,
+		EndFunction = RequiredEmote.Destroyed or RequiredEmote.DestroyedServer or nil,
+		LoopedFunction = RequiredEmote.Looped or RequiredEmote.LoopedServer or nil,
+
+		StartAnimation = RequiredEmote.AssetID.Start and AnimTP(RequiredEmote.AssetID.Start),
+		StartAudio = RequiredEmote.SFX.Start and CreateAudio(RequiredEmote.SFX.Start),
+
+		LoopAnimation = RequiredEmote.AssetID.Loop and AnimTP(RequiredEmote.AssetID.Loop),
+		LoopAudio = RequiredEmote.SFX.Loop and CreateAudio(RequiredEmote.SFX.Loop, true),
+
+		Audios = Audios,
+		AnimTracks = AnimTracks,
+		RequiredEmote = RequiredEmote,
+	}
+
+	print(Emote.Name)
 end
 
 local function UpdateEmotes()
+	-- // ENGINE MADE BY CRIMSON :D
+
 	repeat
 		task.wait()
 	until lchr and lchr.PrimaryPart
 
+	-- // Gets All The Emotes
+
+	for EmoteName, ExtraEmote in ExtraEmotes do
+		LoadEmote({
+			Name = tostring(EmoteName),
+		}, ExtraEmote)
+	end
+
 	for _, Emote in emotes:GetChildren() do
-		local RequiredEmote = table.clone(require(Emote))
-
-		local StartFunction = RequiredEmote.Created or RequiredEmote.CreatedServer or nil
-		local EndFunction = RequiredEmote.Destroyed or RequiredEmote.DestroyedServer or nil
-
-		local AudioProps = RequiredEmote.SFXProperties
-
-		local AnimId = RequiredEmote.AssetID
-		local AudioId = RequiredEmote.SFX
-
-		local Audios = {}
-		local AnimTracks = {}
-
-		local function AnimTP(AnimationId)
-			local Anim = Instance.new("Animation")
-			Anim.AnimationId = AnimationId
-			local AnimT = lchr:WaitForChild("Humanoid", 5):WaitForChild("Animator", 5):LoadAnimation(Anim)
-
-			return AnimT
-		end
-
-		local function CreateAudio(SoundId)
-			local Audio = Instance.new("Sound", lchr.PrimaryPart)
-			Audio.Name = Emote.Name
-			Audio.SoundId = SoundId
-
-			return Audio
-		end
-
-		if typeof(AnimId) == "string" then
-			local Number = 1
-
-			local AnimT = AnimTP(AnimId)
-			AnimTracks[tostring(Number)] = AnimT
-		elseif typeof(AnimId) == "table" then
-			for Number, Anim in ipairs(AnimId) do
-				local AnimT = AnimTP(Anim)
-				AnimTracks[tostring(Number)] = AnimT
-			end
-		end
-
-		if typeof(AudioId) == "string" then
-			local Number = 1
-			Audios[tostring(Number)] = CreateAudio(AudioId)
-		elseif typeof(AudioId) == "table" then
-			for Number, Audio in pairs(AudioId) do
-				Audios[tostring(Number)] = CreateAudio(Audio)
-			end
-		end
-
-		if AudioProps then
-			for _, Audio in pairs(Audios) do
-				for AudioPropName, AudioPropVal in AudioProps do
-					if typeof(AudioPropVal) == "number" and AudioPropVal == 0 then
-						continue
-					end
-
-					Audio[AudioPropName] = AudioPropVal
-				end
-			end
-		end
-
-		Emotes[Emote.Name] = {
-			StartFunction = StartFunction,
-			EndFunction = EndFunction,
-
-			Audios = Audios,
-			AnimTracks = AnimTracks,
-			RequiredEmote = RequiredEmote,
-		}
+		safecall(function()
+			LoadEmote(Emote)
+		end)
 	end
 end
 
@@ -632,131 +811,127 @@ local function RemoveEsp(Text, Highlight, Table)
 end
 
 local function esp()
+	print(_G.Esp, _G.ItemEsp)
 	for chr, v in pairs(Characters) do
-		task.spawn(function()
-			local Highlight = v.Highlight
-			local Text = v.Text
+		local Highlight = v.Highlight
+		local Text = v.Text
 
-			local Root = chr and chr.PrimaryPart
+		local Root = chr and chr.PrimaryPart
 
-			if not Root or not chr:IsDescendantOf(workspace) or not _G.Esp then
-				RemoveEsp(Text, Highlight, v)
-				return
+		if not Root or not chr:IsDescendantOf(workspace) or not _G.Esp then
+			RemoveEsp(Text, Highlight, v)
+			return
+		end
+
+		EspThing(Highlight, Text, v)
+		Highlight = v.Highlight
+		Text = v.Text
+
+		local function IsParentOf(PathName)
+			local Success = false
+			if
+				game:GetService("Workspace").Players:FindFirstChild(PathName)
+				and chr.Parent == game:GetService("Workspace").Players:FindFirstChild(PathName)
+			then
+				if not _G[PathName .. "Esp"] then
+					Highlight.Adornee = nil
+					Text.Visible = false
+					Text:Remove()
+
+					v.Text = nil
+
+					return Success
+				end
+				Success = true
 			end
 
-			EspThing(Highlight, Text, v)
-			Highlight = v.Highlight
-			Text = v.Text
+			return Success
+		end
 
-			local function IsParentOf(PathName)
-				local Success = false
-				if
-					game:GetService("Workspace").Players:FindFirstChild(PathName)
-					and chr.Parent == game:GetService("Workspace").Players:FindFirstChild(PathName)
-				then
-					if not _G[PathName .. "Esp"] then
-						Highlight.Adornee = nil
-						Text.Visible = false
-						Text:Remove()
+		local function ChangeColor(Color)
+			Highlight.FillColor = Color
+			Highlight.OutlineColor = Color
 
-						v.Text = nil
+			Text.Color = Color
 
-						return Success
-					end
-					Success = true
+			Highlight.Adornee = chr
+			Text.Visible = true
+		end
+
+		local Position, OnScreen = Camera:WorldToScreenPoint(Root.Position)
+		if OnScreen then
+			Text.Position = Vector2.new(Position.X, Position.Y)
+			if IsParentOf("Killers") then
+				local SkinName = chr:GetAttribute("SkinNameDisplay")
+				if tostring(SkinName) == "" then
+					SkinName = "None"
 				end
 
-				return Success
-			end
-
-			local function ChangeColor(Color)
-				Highlight.FillColor = Color
-				Highlight.OutlineColor = Color
-
-				Text.Color = Color
-
-				Highlight.Adornee = chr
-				Text.Visible = true
-			end
-
-			local Position, OnScreen = Camera:WorldToScreenPoint(Root.Position)
-			if OnScreen then
-				Text.Position = Vector2.new(Position.X, Position.Y)
-				if IsParentOf("Killers") then
-					local SkinName = chr:GetAttribute("SkinNameDisplay")
-					if tostring(SkinName) == "" then
-						SkinName = "None"
-					end
-
-					Text.Text = "Character: "
-						.. chr:GetAttribute("ActorDisplayName")
-						.. ""
-						.. (" | Skin: " .. SkinName or "None")
-						.. " | Player: "
-						.. chr:GetAttribute("Username")
-					ChangeColor(DefaultKillerESP)
-				elseif IsParentOf("Survivors") then
-					local SkinName = chr:GetAttribute("SkinNameDisplay")
-					if tostring(SkinName) == "" then
-						SkinName = "None"
-					end
-
-					Text.Text = "Character: "
-						.. chr:GetAttribute("ActorDisplayName")
-						.. ""
-						.. (" | Skin: " .. SkinName or "None")
-						.. " | Player: "
-						.. chr:GetAttribute("Username")
-					ChangeColor(DefaultSurvivorESP)
-				elseif IsParentOf("Spectating") then
-					Text.Name = "Player: " .. chr.Name
-					ChangeColor(DefaultSpectatorESP)
+				Text.Text = "Character: "
+					.. chr:GetAttribute("ActorDisplayName")
+					.. ""
+					.. (" | Skin: " .. SkinName or "None")
+					.. " | Player: "
+					.. chr:GetAttribute("Username")
+				ChangeColor(DefaultKillerESP)
+			elseif IsParentOf("Survivors") then
+				local SkinName = chr:GetAttribute("SkinNameDisplay")
+				if tostring(SkinName) == "" then
+					SkinName = "None"
 				end
-			else
-				RemoveEsp(Text, Highlight, v)
+
+				Text.Text = "Character: "
+					.. chr:GetAttribute("ActorDisplayName")
+					.. ""
+					.. (" | Skin: " .. SkinName or "None")
+					.. " | Player: "
+					.. chr:GetAttribute("Username")
+				ChangeColor(DefaultSurvivorESP)
+			elseif IsParentOf("Spectating") then
+				Text.Name = "Player: " .. chr.Name
+				ChangeColor(DefaultSpectatorESP)
 			end
-		end)
+		else
+			RemoveEsp(Text, Highlight, v)
+		end
 	end
 	for Minion, v in pairs(Minions) do
-		task.spawn(function()
-			local Highlight = v.Highlight
-			local Text = v.Text
+		local Highlight = v.Highlight
+		local Text = v.Text
 
-			local Root = Minion and Minion.PrimaryPart
+		local Root = Minion and Minion.PrimaryPart
 
-			if not Root or not Minion:IsDescendantOf(workspace) or not _G.Esp or not _G.MinionEsp then
-				RemoveEsp(Text, Highlight, v)
-				return
-			end
+		if not Root or not Minion:IsDescendantOf(workspace) or not _G.Esp or not _G.MinionEsp then
+			RemoveEsp(Text, Highlight, v)
+			return
+		end
 
-			EspThing(Highlight, Text, v)
-			Highlight = v.Highlight
-			Text = v.Text
+		EspThing(Highlight, Text, v)
 
-			local function ChangeColor(Color)
-				Highlight.FillColor = Color
-				Highlight.OutlineColor = Color
+		Highlight = v.Highlight
+		Text = v.Text
 
-				Text.Color = Color
+		local function ChangeColor(Color)
+			Highlight.FillColor = Color
+			Highlight.OutlineColor = Color
 
-				Highlight.Adornee = Minion
-				Text.Visible = true
-			end
+			Text.Color = Color
 
-			local Position, OnScreen = Camera:WorldToScreenPoint(Root.Position)
-			if OnScreen then
-				Text.Visible = true
-				Text.Position = Vector2.new(Position.X, Position.Y)
-				Text.Text = "Minion"
-				Highlight.Adornee = Minion
-				ChangeColor(DefaultMininonESP)
-			else
-				RemoveEsp(Text, Highlight, v)
-			end
-		end)
-	end
-	for Generator, v in pairs(Gens) do
-		task.spawn(function()
+			Highlight.Adornee = Minion
+			Text.Visible = true
+		end
+
+		local Position, OnScreen = Camera:WorldToScreenPoint(Root.Position)
+		if OnScreen then
+			Text.Visible = true
+			Text.Position = Vector2.new(Position.X, Position.Y)
+			Text.Text = "Minion"
+			Highlight.Adornee = Minion
+			ChangeColor(DefaultMininonESP)
+		else
+			RemoveEsp(Text, Highlight, v)
+		end
+		for Generator, v in pairs(Gens) do
 			local Highlight = v.Highlight
 			local Text = v.Text
 
@@ -800,10 +975,8 @@ local function esp()
 			else
 				RemoveEsp(Text, Highlight, v)
 			end
-		end)
-	end
-	for Item, v in pairs(Items) do
-		task.spawn(function()
+		end
+		for Item, v in pairs(Items) do
 			local Highlight = v.Highlight
 			local Text = v.Text
 
@@ -838,10 +1011,8 @@ local function esp()
 			else
 				RemoveEsp(Text, Highlight, v)
 			end
-		end)
-	end
-	for Spray, v in pairs(Sprays) do
-		task.spawn(function()
+		end
+		for Spray, v in pairs(Sprays) do
 			local Highlight = v.Highlight
 			local Text = v.Text
 			local MODELSpray = v.MODELSpray
@@ -890,11 +1061,10 @@ local function esp()
 				Spray.Transparency = 1
 				RemoveEsp(Text, Highlight, v)
 			end
-		end)
+		end
 	end
 end
-
--- Script (Looads)
+-- Script
 
 safecall(UpdateEmotes)
 
@@ -935,13 +1105,26 @@ end
 for _, Emote in emotes:GetChildren() do
 	local requireEmote = require(Emote)
 	if requireEmote.Exclusive then
-		table.insert(Exclusive_Emotes, "[!] " .. requireEmote.DisplayName)
+		table.insert(Exclusive_Emotes, requireEmote.DisplayName)
 	else
 		table.insert(Gettable_Emotes, requireEmote.DisplayName)
 	end
 end
 
--- Load
+for _, Emote in emotes:GetChildren() do
+	local requireEmote = require(Emote)
+	if requireEmote.Exclusive then
+		table.insert(Exclusive_Emotes, requireEmote.DisplayName)
+	else
+		table.insert(Gettable_Emotes, requireEmote.DisplayName)
+	end
+end
+
+for _, ExtraEmote in ExtraEmotes do
+	table.insert(Exclusive_Emotes, ExtraEmote.DisplayName)
+end
+
+-- UI
 
 local NebulaIcons = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/nebula-icon-library-loader"))()
 local Luna = loadstring(game:HttpGet("https://raw.nebulasoftworks.xyz/luna", true))()
@@ -1228,7 +1411,7 @@ Main:CreateSection(
 
 Main:CreateDropdown({
 	Options = Gettable_Emotes,
-	CurrentOption = {Gettable_Emotes[1]},
+	CurrentOption = { Gettable_Emotes[1] },
 	Multi = false, -- true / false, allows multiple choices to be selected
 	Searchable = true, -- true / false, makes the dropdown searchable (great for a long list of values)
 
@@ -1243,7 +1426,7 @@ Main:CreateDropdown({
 
 Main:CreateDropdown({
 	Options = Exclusive_Emotes,
-	CurrentOption = {Exclusive_Emotes[1]},
+	CurrentOption = { Exclusive_Emotes[1] },
 	Default = 0, -- number index of the value / string
 	Multi = false, -- true / false, allows multiple choices to be selected
 	Searchable = true, -- true / false, makes the dropdown searchable (great for a long list of values)
@@ -1440,8 +1623,3 @@ local RenderStepped = game:GetService("RunService").RenderStepped:Connect(functi
 	esp()
 	AutoDoGens()
 end)
-
-UISettings:BuildConfigSection() -- Tab Should be the name of the tab you are adding this section to.
-
-Luna:LoadAutoloadConfig()
-
